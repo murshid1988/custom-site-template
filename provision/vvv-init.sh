@@ -124,8 +124,9 @@ PHP
 else
   echo " * wp_type was set to none, provisioning WP was skipped, moving to Nginx configs"
 #   composer config http-basic.example.org username password
-  composer config https://repo.packagist.com/gandalf ${E25_BASE_UN} ${E25_BASE_PW}
-  composer create-project "e25/base2-legolas" --repository-url https://repo.packagist.com/gandalf ${VVV_PATH_TO_SITE}/public_html 
+  noroot composer config -g https://repo.packagist.com/gandalf ${E25_BASE_UN} ${E25_BASE_PW}
+  noroot composer create-project "e25/base2-legolas" --repository-url https://repo.packagist.com/gandalf ${VVV_PATH_TO_SITE}/public_html 
+  noroot composer config -g --unset https://repo.packagist.com/gandalf
 fi
 
 echo " * Copying the sites Nginx config template"

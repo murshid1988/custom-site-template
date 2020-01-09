@@ -10,7 +10,7 @@ DOMAIN=$(get_primary_host "${VVV_SITE_NAME}".test)
 SITE_TITLE=$(get_config_value 'site_title' "${DOMAIN}")
 WP_VERSION=$(get_config_value 'wp_version' 'latest')
 WP_LOCALE=$(get_config_value 'locale' 'en_US')
-WP_TYPE=$(get_config_value 'wp_type' "single")
+WP_TYPE=$(get_config_value 'wp_type' "none")
 DB_NAME=$(get_config_value 'db_name' "${VVV_SITE_NAME}")
 DB_NAME=${DB_NAME//[\\\/\.\<\>\:\"\'\|\?\!\*]/}
 
@@ -123,6 +123,7 @@ PHP
   fi
 else
   echo " * wp_type was set to none, provisioning WP was skipped, moving to Nginx configs"
+  composer --version
 fi
 
 echo " * Copying the sites Nginx config template"
@@ -159,27 +160,27 @@ else
   sed -i "s#{{LIVE_URL}}##" "${VVV_PATH_TO_SITE}/provision/vvv-nginx.conf"
 fi
 
-get_config_value 'wpconfig_constants' |
-  while IFS='' read -r -d '' key &&
-        IFS='' read -r -d '' value; do
-      echo " * Adding constant '${key}' with value '${value}' to wp-config.php"
-      noroot wp config set "${key}" "${value}" --raw
-  done
+# get_config_value 'wpconfig_constants' |
+#   while IFS='' read -r -d '' key &&
+#         IFS='' read -r -d '' value; do
+#       echo " * Adding constant '${key}' with value '${value}' to wp-config.php"
+#       noroot wp config set "${key}" "${value}" --raw
+#   done
 
-WP_PLUGINS=$(get_config_value 'install_plugins' '')
-if [ ! -z "${WP_PLUGINS}" ]; then
-  for plugin in ${WP_PLUGINS//- /$'\n'}; do
-      echo " * Installing/activating plugin: '${plugin}'"
-      noroot wp plugin install "${plugin}" --activate
-  done
-fi
+# WP_PLUGINS=$(get_config_value 'install_plugins' '')
+# if [ ! -z "${WP_PLUGINS}" ]; then
+#   for plugin in ${WP_PLUGINS//- /$'\n'}; do
+#       echo " * Installing/activating plugin: '${plugin}'"
+#       noroot wp plugin install "${plugin}" --activate
+#   done
+# fi
 
-WP_THEMES=$(get_config_value 'install_themes' '')
-if [ ! -z "${WP_THEMES}" ]; then
-    for theme in ${WP_THEMES//- /$'\n'}; do
-      echo " * Installing theme: '${theme}'"
-      noroot wp theme install "${theme}"
-    done
-fi
+# WP_THEMES=$(get_config_value 'install_themes' '')
+# if [ ! -z "${WP_THEMES}" ]; then
+#     for theme in ${WP_THEMES//- /$'\n'}; do
+#       echo " * Installing theme: '${theme}'"
+#       noroot wp theme install "${theme}"
+#     done
+# fi
 
 echo " * Site Template provisioner script completed for ${VVV_SITE_NAME}"
